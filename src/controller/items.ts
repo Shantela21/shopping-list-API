@@ -8,12 +8,12 @@ export const getItemById = (id: number): ShoppingItem | undefined => {
     const item = items.find(item => item.id === id);
     return item;
 }
-export const addItem = (name: string, quantity: number, purchasedStatus: boolean): ShoppingItem => {
+export const addItem = (name: string, quantity: number, category: string): ShoppingItem => {
     const newItem: ShoppingItem = {
         id: currentId++,
         name,
         quantity,
-        purchasedStatus
+        category
     }
     items.push(newItem);
     return newItem;

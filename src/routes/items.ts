@@ -31,11 +31,9 @@ export const itemsRoute = async (req: IncomingMessage, res: ServerResponse) => {
       req.on("data", (chunk: Buffer) => {
         body += chunk.toString();
       });
-      console.log(body, "body");
       req.on("end", () => {
         try {
-          const { name, quantity, purchasedStatus } = JSON.parse(body);
-          console.log(name, quantity, purchasedStatus);
+          const { name, quantity, category } = JSON.parse(body);
           if (!name || typeof name !== "string") {
             res.writeHead(400, { "content-type": "application/json" });
             res.end(JSON.stringify({ error: "Name is required" }));
@@ -50,15 +48,14 @@ export const itemsRoute = async (req: IncomingMessage, res: ServerResponse) => {
             );
             return;
           }
-          if (!purchasedStatus || typeof purchasedStatus !== "boolean") {
+          if (!category || typeof category !== "string") {
             res.writeHead(400, { "content-type": "application/json" });
-            res.end(JSON.stringify({ error: "Purchased Status is required" }));
+            res.end(JSON.stringify({ error: "Category is required" }));
             return;
           }
-          const newItem = addItem(name, quantity, purchasedStatus);
+          const newItem = addItem(name, quantity, category);
           res.writeHead(201, { "content-type": "application/json" });
           res.end(JSON.stringify(newItem));
-          return;
         } catch (error) {
           res.writeHead(400, { "content-type": "application/json" });
           res.end(JSON.stringify({ error: "Invalid JSON payload" }));
