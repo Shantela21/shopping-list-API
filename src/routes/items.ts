@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { getItems, getItemById, addItem } from "../controller/items";
+import { getItems, getItemById, addItem, updateItem } from "../controller/items";
 // https://localhost:4000/items
 export const itemsRoute = async (req: IncomingMessage, res: ServerResponse) => {
   if (req.url?.startsWith("/items")) {
@@ -33,7 +33,7 @@ export const itemsRoute = async (req: IncomingMessage, res: ServerResponse) => {
       });
       req.on("end", () => {
         try {
-          const { name, quantity, category } = JSON.parse(body);
+          const { name, quantity, purchasedStatus } = JSON.parse(body);
           if (!name || typeof name !== "string") {
             res.writeHead(400, { "content-type": "application/json" });
             res.end(JSON.stringify({ error: "Name is required" }));
@@ -48,14 +48,75 @@ export const itemsRoute = async (req: IncomingMessage, res: ServerResponse) => {
             );
             return;
           }
-          if (!category || typeof category !== "string") {
+          if (!purchasedStatus || typeof purchasedStatus !== "boolean") {
             res.writeHead(400, { "content-type": "application/json" });
-            res.end(JSON.stringify({ error: "Category is required" }));
+            res.end(JSON.stringify({ error: "Purchase status is required" }));
             return;
           }
-          const newItem = addItem(name, quantity, category);
+          const newItem = addItem(name, quantity, purchasedStatus);
           res.writeHead(201, { "content-type": "application/json" });
           res.end(JSON.stringify(newItem));
+        } catch (error) {
+          res.writeHead(400, { "content-type": "application/json" });
+          res.end(JSON.stringify({ error: "Invalid JSON payload" }));
+        }
+      });
+      return;
+    }
+    if (req.method === "PUT" && id) {
+      if (isNaN(id)) {
+        res.writeHead(400, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "Invalid item ID" }));
+        return;
+      }
+      let body = "";
+      req.on("data", (chunk: Buffer) => {
+        body += chunk.toString();
+      });
+      req.on("end", () => {
+        try {
+          const updates = JSON.parse(body);
+          const allowedFields = ['name', 'quantity', 'purchasedStatus'];
+          const validUpdates: any = {};
+          
+          // Validate and filter updates
+          for (const [key, value] of Object.entries(updates)) {
+            if (!allowedFields.includes(key)) {
+              res.writeHead(400, { "content-type": "application/json" });
+              res.end(JSON.stringify({ error: `Field '${key}' is not allowed for updates` }));
+              return;
+            }
+            
+            if (key === 'name' && (typeof value !== 'string' || value.trim() === '')) {
+              res.writeHead(400, { "content-type": "application/json" });
+              res.end(JSON.stringify({ error: "Name must be a non-empty string" }));
+              return;
+            }
+            
+            if (key === 'quantity' && (typeof value !== 'number' || value < 0)) {
+              res.writeHead(400, { "content-type": "application/json" });
+              res.end(JSON.stringify({ error: "Quantity must be a non-negative number" }));
+              return;
+            }
+            
+            if (key === 'purchasedStatus' && typeof value !== 'boolean') {
+              res.writeHead(400, { "content-type": "application/json" });
+              res.end(JSON.stringify({ error: "Purchased status must be a boolean" }));
+              return;
+            }
+            
+            validUpdates[key] = value;
+          }
+          
+          const updatedItem = updateItem(id, validUpdates);
+          if (!updatedItem) {
+            res.writeHead(404, { "content-type": "application/json" });
+            res.end(JSON.stringify({ error: "Item not found" }));
+            return;
+          }
+          
+          res.writeHead(200, { "content-type": "application/json" });
+          res.end(JSON.stringify(updatedItem));
         } catch (error) {
           res.writeHead(400, { "content-type": "application/json" });
           res.end(JSON.stringify({ error: "Invalid JSON payload" }));
