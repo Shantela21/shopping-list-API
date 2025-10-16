@@ -1,7 +1,37 @@
 {
+  "name": "shopping-list-api",
+  "version": "1.0.0",
+  "description": "A REST API for managing shopping list items with full CRUD operations",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "start": "ts-node src/server.ts",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shantela21/shopping-list-API.git"
+  },
+  "keywords": [
+    "shopping",
+    "list",
+    "api",
+    "rest",
+    "typescript",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shantela21/shopping-list-API/issues"
+  },
+  "homepage": "https://github.com/Shantela21/shopping-list-API#readme",
   "dependencies": {
-    "@types/node": "^24.7.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "nodemon": "^3.1.10"
   }
 }
