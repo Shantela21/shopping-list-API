@@ -101,4 +101,5 @@ npm start
 ## 👩🏽‍💻 Author
 
 Developed by **Shantela Noyila**
+
 💻 GitHub: **Shantela21**

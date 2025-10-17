@@ -1,5 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from "http";
 import { itemsRoute } from "./routes/items";
+import { ResponseHandler } from "./utils/responses";
 const PORT = 4000;
 const requestListener = (req: IncomingMessage, res: ServerResponse) => {
   console.log(req.url, "url");
@@ -8,8 +9,7 @@ const requestListener = (req: IncomingMessage, res: ServerResponse) => {
     itemsRoute(req, res);
   } else {
     //  send only one response
-    res.writeHead(404, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: "Items not found!" }));
+    ResponseHandler.notFound(res, "Route not found");
   }
 };
 const server = createServer(requestListener);

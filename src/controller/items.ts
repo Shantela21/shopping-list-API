@@ -43,3 +43,13 @@ export const updateItem = (id: number, updates: Partial<Pick<ShoppingItem, 'name
     
     return item;
 }
+
+export const deleteItem = (id: number): boolean => {
+    const itemIndex = items.findIndex(item => item.id === id);
+    if (itemIndex === -1) {
+        return false;
+    }
+    
+    items.splice(itemIndex, 1);
+    return true;
+}
